@@ -20,11 +20,12 @@ def fit_phase(freq,phase):
 
 def estimate_delay(fname="blink_002ms.mov",
                    max_freq=8.0,
-                   min_freq=0.5,
+                   min_freq=2.0,
                    dec=10,
                    area0=[688,[440,441]],
                    fft_len=512,
                    plot_frames=False,
+                   n_frames=0,
                    area1=[307,[1458,1459]]):
 
     
@@ -35,7 +36,9 @@ def estimate_delay(fname="blink_002ms.mov",
     #cap = cv2.VideoCapture("blink_010ms.mov")
     cap = cv2.VideoCapture(fname)
     frames_per_sec=cap.get(cv2.CAP_PROP_FPS)
-    n_frames=cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    n_total_frames=cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    if n_frames == 0:
+        n_frames=n_total_frames
     
     #print(cv2.GetCaptureProperty(cap,cv2.CV_CAP_PROP_FPS))
     #print("fps %1.2f"%(cap.get(cv2.CV_CAP_PROP_FPS)))
@@ -45,6 +48,9 @@ def estimate_delay(fname="blink_002ms.mov",
 
     while(cap.isOpened()):
         print("%d/%d"%(fi,n_frames))
+        if fi > n_frames:
+            cap.release()
+            break
         fi+=1
         re,frame = cap.read()
         try:
@@ -63,14 +69,25 @@ def estimate_delay(fname="blink_002ms.mov",
             plt.show()
         
     I0=n.array(I0)
+    I0=I0-n.mean(I0)
     I1=n.array(I1)
+    I1=I1-n.mean(I1)
 
-    XCA=n.zeros(fft_len,dtype=n.complex128)
+#    
+#    XCA=n.zeros(fft_len,dtype=n.complex128)
     n_frames=len(I0)
-    n_windows=int(n.floor(n_frames/fft_len))
-    freqs=n.fft.fftshift(n.fft.fftfreq(fft_len,d=1/frames_per_sec))
-    for i in range(n_windows):
-        XCA+=n.fft.fftshift(n.fft.fft(I0[(i*fft_len):((i+1)*fft_len)])*n.conj(n.fft.fft(I1[(i*fft_len):((i+1)*fft_len)])))
+#    n_windows=int(n.floor(n_frames/fft_len))
+    
+
+    XC=n.fft.fftshift(n.fft.fft(I0)*n.conj(n.fft.fft(I1)))
+    # weight by power    
+    pw=n.abs(XC)**2.0
+    XCA=stuffr.decimate(XC,dec=dec)
+    ws=stuffr.decimate(pw,dec=dec)
+    freqs=stuffr.decimate(pw*n.fft.fftshift(n.fft.fftfreq(n_frames,d=1/frames_per_sec)),dec=dec)/ws
+
+#    for i in range(n_windows):
+ #       XCA+=n.fft.fftshift(n.fft.fft(I0[(i*fft_len):((i+1)*fft_len)])*n.conj(n.fft.fft(I1[(i*fft_len):((i+1)*fft_len)])))
     
     t=1e3*n.arange(n_frames)/frames_per_sec
     plt.plot(t,I0,label="$I_1(t)$")
@@ -114,7 +131,13 @@ def estimate_delay(fname="blink_002ms.mov",
     return(tau,tau_std)
 
 
-estimate_delay(fname="blink_5ms_juha.mp4",max_freq=6.0,min_freq=0.5,dec=10,area0=[441,[506,853]],area1=[441,[1636,2137]])
+#estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_b.mp4",max_freq=8.0,min_freq=2,dec=10,area0=[374,[510,511]],area1=[374,[600,601]],plot_frames=True,n_frames=1000)
+
+#estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_b.mp4",max_freq=8.0,min_freq=2,dec=10,area0=[374,[510,511]],area1=[374,[1930,1931]],plot_frames=False,n_frames=10000)
+
+estimate_delay(fname="/data0/blink_cam_cal/blink_2ms_0deg_b.mp4",max_freq=8.0,min_freq=2,dec=10,area0=[374,[510,511]],area1=[374,[1930,1931]],plot_frames=False,n_frames=10000)
+
+
 #estimate_delay(fname="blink_002ms.mov",max_freq=8.0,min_freq=0.5,dec=10,area0=[688,[440,441]],area1=[307,[1458,1459]])
 
 #estimate_delay(fname="blink_100ms.mov",max_freq=8.0,min_freq=0.5,dec=10,area0=[500,[100,101]],area1=[500,[1500,1501]])
