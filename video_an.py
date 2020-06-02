@@ -136,7 +136,7 @@ def estimate_delay(fname="blink_002ms.mov",
     
     fidx=n.where( (n.abs(freqs)<max_freq)  & (freqs>min_freq) )[0]
     tau,tau_std,model,var_est=fit_phase(freqs[fidx],phase[fidx],n.abs(XCA[fidx]))
-    print("tau %1.2f+/-%1.2f var %f"%(tau*1e6,tau_std*1e6,n.sqrt(var_est)))
+    print("tau %1.2f+/-%1.2f measurement error std estimate %f"%(tau*1e6,tau_std*1e6,n.sqrt(var_est)))
     
     plt.plot(freqs,phase,".",label="All measurements")
     plt.plot(freqs[fidx],phase[fidx],".",label="Fitted measurements")
@@ -159,7 +159,21 @@ def estimate_delay(fname="blink_002ms.mov",
 # same blinker
 #estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_b.mp4",max_freq=8.0,min_freq=2,dec=10,area0=[374,[510,511]],area1=[374,[600,601]],plot_frames=True,n_frames=1000)
 
-estimate_delay(fname="blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[1800,1801]],plot_frames=False,n_frames=10000,weight=True,unwrap=False)
+
+# same light
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[565,566]],plot_frames=False,n_frames=0,weight=True,unwrap=False)
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[565,566]],plot_frames=False,n_frames=300,weight=True,unwrap=False)
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[565,566]],plot_frames=False,n_frames=1000,weight=True,unwrap=False)
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[565,566]],plot_frames=False,n_frames=3000,weight=True,unwrap=False)
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[565,566]],plot_frames=False,n_frames=10000,weight=True,unwrap=False)
+
+
+
+# different frame
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[1800,1801]],plot_frames=False,n_frames=300,weight=True,unwrap=False)
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[1800,1801]],plot_frames=False,n_frames=1000,weight=True,unwrap=False)
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[1800,1801]],plot_frames=False,n_frames=3000,weight=True,unwrap=False)
+estimate_delay(fname="/data0/blink_cam_cal/blink_1ms_0deg_eb.mp4",max_freq=10.0,min_freq=0,dec=40,area0=[266,[560,561]],area1=[266,[1800,1801]],plot_frames=False,n_frames=10000,weight=True,unwrap=False)
 
 #estimate_delay(fname="/data0/blink_cam_cal/blink_2ms_0deg_b.mp4",max_freq=8.0,min_freq=2,dec=10,area0=[374,[510,511]],area1=[374,[1930,1931]],plot_frames=False,n_frames=10000)
 
